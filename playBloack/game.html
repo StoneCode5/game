@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #id-canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="id-canvas" width="400" height="300"></canvas>
+    <script src="./js/util.js"></script>
+    <script>
+
+        function Game(options) {
+            var _this = this
+            this.canvas = document.getElementById('id-canvas');
+            this.context = this.canvas.getContext('2d')
+            this.actions = {}
+            this.keydowns = {}
+            this.isGameStart = false
+            this.blocks = []
+            this.blockNum = options.blockNum
+            window.addEventListener('keydown', function (event) {
+                _this.keydowns[event.key] = true
+            })
+            window.addEventListener('keyup', function (event) {
+                _this.keydowns[event.key] = false
+            })
+            this.registerActions = function (key, action) {
+                _this.actions[key] = action
+            }
+            this.drwaImage = function (obj) {
+                _this.context.drawImage(obj.image, obj.x, obj.y)
+            }
+
+            setInterval(() => {
+                var actions = Object.keys(_this.actions)
+                for (var i = 0; i < actions.length; i++) {
+                    var key = actions[i];
+                    if (_this.keydowns[key] === true) {
+                        _this.actions[key]()
+                    }
+                }
+                if (_this.isGameStart) {
+                    console.log(_this.keydowns)
+
+                    _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height)
+                    _this.update()
+                    _this.draw()
+                }
+            }, 1000 / 50)
+
+        }
+
+        function Paddle(img, posX, posY) {
+            var _this = this
+            this.x = posX
+            this.y = posY
+            this.leftRun = false
+            this.RightRun = false
+            this.speedX = 5
+            this.image = loadImgFromPath(img)
+
+            this.moveLeft = function () {
+                _this.x -= _this.speedX
+            }
+
+            this.moveRight = function () {
+                _this.x += _this.speedX
+            }
+
+        }
+
+        function Ball(img, posX, posY) {
+            var _this = this
+            this.x = posX
+            this.y = posY
+            this.isMove = false
+            this.speedX = 8
+            this.speedY = 8
+            this.isMoved = false
+            this.image = loadImgFromPath(img)
+
+            this.move = function () {
+                if (_this.x <= 0 || _this.x >= 400) {
+                    _this.speedX *= -1
+                }
+                if (_this.y <= 0 || _this.y >= 300) {
+                    _this.speedY *= -1
+                }
+                _this.x += _this.speedX
+                _this.y += _this.speedY
+            }
+
+        }
+
+        function Block(options) {
+            var _this = this
+            this.x = options.posX
+            this.y = options.posY
+            this.w = options.width
+            this.h = options.height
+            this.alive = true
+            this.kill = function () {
+                _this.alive = false
+            }
+            this.image = loadImgFromPath(options.imgPath)
+        }
+
+        function __main() {
+            var game = new Game({
+                blockNum: 5,
+            })
+
+            var paddle = new Paddle('./img/paddle.png', 150, 250)
+
+            var ball = new Ball('./img/ball.png', 250, 180)
+
+            for (var i = 0; i < game.blockNum; i++) {
+                var x = i * 100
+                var b = new Block({
+                    posX: x,
+                    posY: 100,
+                    width: 40,
+                    height: 19,
+                    imgPath: './img/block.png'
+                })
+                game.blocks.push(b)
+            }
+
+            game.registerActions('a', function () {
+                if (paddle.x > 0) {
+                    paddle.moveLeft()
+                }
+
+            })
+
+            game.registerActions('d', function () {
+                if (paddle.x + paddle.image.width < 400) {
+                    paddle.moveRight()
+                }
+            })
+
+            game.registerActions('f', function () {
+                game.isGameStart = true
+            })
+
+            game.draw = function () {
+                game.drwaImage(paddle)
+                game.drwaImage(ball)
+                for (var i = 0; i < game.blocks.length; i++) {
+                    var block = game.blocks[i]
+                    if (block.alive) {
+                        game.drwaImage(block)
+                    }
+                }
+
+            }
+            game.update = function () {
+                if (isCollide(paddle, ball)) {
+                    ball.speedY *= -1
+                }
+                for (var i = 0; i < game.blocks.length; i++) {
+                    var block = game.blocks[i]
+                    if (block.alive) {
+                        if (rectIntersects(block, ball) || rectIntersects(ball, block)) {
+                            block.kill()
+                            ball.speedY *= -1
+                        }
+                    }
+                }
+                ball.move()
+            }
+        }
+
+        __main()
+    </script>
+</body>
+
+</html>
