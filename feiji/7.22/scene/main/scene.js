@@ -1,19 +1,38 @@
 class Scene extends GuaScene {
     constructor(game) {
         super(game)
+        this.game = game
         this.setup()
-        var g = this
-
+        this.setInputs()
+        
     }
     setup() {
         var game = this.game
         this.bg = GuaImage.new(game, 'bg')
-        this.player = GuaImage.new(game, 'player')
+        this.player = Player.new(game, 'player')
         this.player.x = 200
         this.player.y = 600
 
         this.addElement(this.bg)
         this.addElement(this.player)
+    }
+
+    setInputs() {
+        var s = this
+        s.game.registerAction('a', function(){
+            console.log('left')
+            s.player.moveLeft()
+        })
+        s.game.registerAction('d', function(){
+            s.player.moveRight()
+        })
+        s.game.registerAction('w', function(){
+            console.log('left')
+            s.player.moveUp()
+        })
+        s.game.registerAction('s', function(){
+            s.player.moveDown()
+        })
     }
 }
 
@@ -29,12 +48,7 @@ class Scene extends GuaScene {
 
 //     var blocks = loadLevel(game, 1)
 
-//     game.registerAction('a', function(){
-//         paddle.moveLeft()
-//     })
-//     game.registerAction('d', function(){
-//         paddle.moveRight()
-//     })
+//     
 //     game.registerAction('f', function(){
 //         ball.fire()
 //     })
