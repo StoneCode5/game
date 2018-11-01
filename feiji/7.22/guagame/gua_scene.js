@@ -17,6 +17,9 @@ class GuaScene {
         this.elements.push(guaImage)
     }
     update() {
-
+        for (let i = 0; i < this.elements.length; i++) {
+            const element = this.elements[i];
+            element.update()
+        }
     }
 }

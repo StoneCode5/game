@@ -40,7 +40,10 @@ var __main = function() {
         // paddle: 'img/paddle.png',
         bg: 'assets/image/background.png',
         player: 'assets/image/hero1.png',
-
+        enemy0: 'assets/image/enemy0.png',
+        enemy1: 'assets/image/enemy1.png',
+        enemy2: 'assets/image/enemy2.png',   
+        bullet: 'assets/image/bullet.png',                 
     }
     var game = GuaGame.instance(50, images, function(g){
         var s = Scene.new(g)

@@ -9,12 +9,18 @@ class Scene extends GuaScene {
     setup() {
         var game = this.game
         this.bg = GuaImage.new(game, 'bg')
-        this.player = Player.new(game, 'player')
+        this.player = Player.new(game, this)
         this.player.x = 200
         this.player.y = 600
-
+        this.enemiesNumber = 10
+        this.enemy0 = Enemy.new(game, 'enemy0')
+        
         this.addElement(this.bg)
         this.addElement(this.player)
+        this.addElement(this.enemy0)
+
+        this.addEnemies()
+
     }
 
     setInputs() {
@@ -33,6 +39,22 @@ class Scene extends GuaScene {
         s.game.registerAction('s', function(){
             s.player.moveDown()
         })
+        s.game.registerAction('j', function(){
+            s.player.fire()
+        })
+    }
+
+    randomBetween(start, end) {
+        var n = Math.random() * (end - start + 1)
+        return Math.floor(n + start)
+    }
+
+    addEnemies() {
+        for (let i = 0; i < this.enemiesNumber; i++) {
+            var n = this.randomBetween(0,1)
+            var enemy = Enemy.new(this.game, `enemy${n}`)
+            this.addElement(enemy)
+        }
     }
 }
 
